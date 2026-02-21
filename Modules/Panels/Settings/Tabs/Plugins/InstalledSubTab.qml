@@ -33,34 +33,11 @@ ColumnLayout {
   }
 
   // Auto-update toggle
-  RowLayout {
-    spacing: Style.marginM
-    Layout.fillWidth: true
-
-    ColumnLayout {
-      spacing: Style.marginXS
-      Layout.fillWidth: true
-
-      NText {
-        text: I18n.tr("panels.plugins.auto-update")
-        color: Color.mOnSurface
-      }
-
-      NText {
-        text: I18n.tr("panels.plugins.auto-update-description")
-        font.pointSize: Style.fontSizeXS
-        color: Color.mOnSurfaceVariant
-        wrapMode: Text.WordWrap
-        Layout.fillWidth: true
-      }
-    }
-
-    NToggle {
-      checked: Settings.data.plugins.autoUpdate
-      onToggled: checked => {
-                   Settings.data.plugins.autoUpdate = checked;
-                 }
-    }
+  NToggle {
+    label: I18n.tr("panels.plugins.auto-update")
+    description: I18n.tr("panels.plugins.auto-update-description")
+    checked: Settings.data.plugins.autoUpdate
+    onToggled: checked => Settings.data.plugins.autoUpdate = checked
   }
 
   // Check for updates button
@@ -72,9 +49,7 @@ ColumnLayout {
     enabled: !isChecking
     visible: Object.keys(PluginService.pluginUpdates).length === 0
     Layout.fillWidth: true
-    onClicked: {
-      PluginService.checkForUpdates();
-    }
+    onClicked: PluginService.checkForUpdates()
   }
 
   // Update All button
@@ -172,7 +147,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.leftMargin: Style.borderS
         Layout.rightMargin: Style.borderS
-        implicitHeight: Math.round(contentColumn.implicitHeight + Style.marginL * 2)
+        implicitHeight: Math.round(contentColumn.implicitHeight + Style.margin2L)
         color: Color.mSurface
 
         ColumnLayout {
@@ -203,8 +178,8 @@ ColumnLayout {
               visible: modelData.official === true
               color: Color.mSecondary
               radius: Style.radiusXS
-              implicitWidth: officialBadgeRow.implicitWidth + Style.marginS * 2
-              implicitHeight: officialBadgeRow.implicitHeight + Style.marginXS * 2
+              implicitWidth: officialBadgeRow.implicitWidth + Style.margin2S
+              implicitHeight: officialBadgeRow.implicitHeight + Style.margin2XS
 
               RowLayout {
                 id: officialBadgeRow
@@ -229,6 +204,15 @@ ColumnLayout {
             // Spacer
             Item {
               Layout.fillWidth: true
+            }
+
+            NIconButtonHot {
+              icon: "bug"
+              hot: PluginService.isPluginHotReloadEnabled(modelData.id)
+              tooltipText: PluginService.isPluginHotReloadEnabled(modelData.id) ? I18n.tr("panels.plugins.development-disable") : I18n.tr("panels.plugins.development-enable")
+              baseSize: Style.baseWidgetSize * 0.7
+              onClicked: PluginService.togglePluginHotReload(modelData.id)
+              visible: Settings.isDebug
             }
 
             NIconButton {

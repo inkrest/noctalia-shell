@@ -45,8 +45,8 @@ Item {
   readonly property real barFontSize: Style.getBarFontSizeForScreen(screen?.name)
   readonly property int pillHeight: buttonSize
   readonly property int pillOverlap: Math.round(buttonSize * 0.5)
-  readonly property int maxPillWidth: rotateText ? Math.max(buttonSize, Math.round(textItem.implicitHeight + Style.marginXL)) : buttonSize
-  readonly property int maxPillHeight: rotateText ? Math.max(1, Math.round(textItem.implicitWidth + Style.marginXL + Math.round(iconCircle.height / 4))) : Math.max(1, Math.round(textItem.implicitHeight + Style.marginXL))
+  readonly property int maxPillWidth: rotateText ? Math.max(buttonSize, Math.round(textItem.implicitHeight + Style.margin2M)) : buttonSize
+  readonly property int maxPillHeight: rotateText ? Math.max(1, Math.round(textItem.implicitWidth + Style.margin2M + Math.round(iconCircle.height / 4))) : Math.max(1, Math.round(textItem.implicitHeight + Style.margin2M))
 
   // Determine pill direction based on section position
   readonly property bool openDownward: oppositeDirection
@@ -64,18 +64,14 @@ Item {
 
   readonly property real iconSize: Style.toOdd(pillHeight * 0.48)
 
-  // Content height calculation (for implicit sizing and visual layout)
+  // Content height calculation (for implicit sizing)
   readonly property real contentHeight: {
     if (collapseToIcon) {
       return hasIcon ? buttonSize : 0;
     }
-    if (revealed) {
-      var overlap = hasIcon ? pillOverlap : 0;
-      var baseHeight = hasIcon ? buttonSize : 0;
-      return baseHeight + Math.max(0, maxPillHeight - overlap);
-    }
-    // Fallback to buttonSize in idle state to remain clickable
-    return buttonSize;
+    var overlap = hasIcon ? pillOverlap : 0;
+    var baseHeight = hasIcon ? buttonSize : 0;
+    return baseHeight + Math.max(0, pill.height - overlap);
   }
 
   // Fill parent width to extend horizontal click area
@@ -327,15 +323,16 @@ Item {
       }
       TooltipService.hide();
     }
-    onClicked: function (mouse) {
-      if (mouse.button === Qt.LeftButton) {
-        root.clicked();
-      } else if (mouse.button === Qt.RightButton) {
-        root.rightClicked();
-      } else if (mouse.button === Qt.MiddleButton) {
-        root.middleClicked();
-      }
-    }
+    onClicked: mouse => {
+                 TooltipService.hide();
+                 if (mouse.button === Qt.LeftButton) {
+                   root.clicked();
+                 } else if (mouse.button === Qt.RightButton) {
+                   root.rightClicked();
+                 } else if (mouse.button === Qt.MiddleButton) {
+                   root.middleClicked();
+                 }
+               }
     onWheel: wheel => root.wheel(wheel.angleDelta.y)
   }
 

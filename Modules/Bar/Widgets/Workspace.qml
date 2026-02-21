@@ -61,7 +61,7 @@ Item {
   readonly property real unfocusedIconsOpacity: (widgetSettings.unfocusedIconsOpacity !== undefined) ? widgetSettings.unfocusedIconsOpacity : widgetMetadata.unfocusedIconsOpacity
   readonly property real groupedBorderOpacity: (widgetSettings.groupedBorderOpacity !== undefined) ? widgetSettings.groupedBorderOpacity : widgetMetadata.groupedBorderOpacity
   readonly property bool enableScrollWheel: (widgetSettings.enableScrollWheel !== undefined) ? widgetSettings.enableScrollWheel : widgetMetadata.enableScrollWheel
-  readonly property bool reverseScroll: (widgetSettings.reverseScroll !== undefined) ? widgetSettings.reverseScroll : (widgetMetadata.reverseScroll || false)
+  readonly property bool reverseScroll: Settings.data.general.reverseScroll
   readonly property real iconScale: (widgetSettings.iconScale !== undefined) ? widgetSettings.iconScale : widgetMetadata.iconScale
   readonly property string focusedColor: (widgetSettings.focusedColor !== undefined) ? widgetSettings.focusedColor : widgetMetadata.focusedColor
   readonly property string occupiedColor: (widgetSettings.occupiedColor !== undefined) ? widgetSettings.occupiedColor : widgetMetadata.occupiedColor
@@ -793,7 +793,7 @@ Item {
           topMargin: -Style.fontSizeXS * 0.25
         }
 
-        width: Math.max(groupedWorkspaceNumber.implicitWidth + (Style.marginXS * 2), Style.fontSizeXXS * 2)
+        width: Math.max(groupedWorkspaceNumber.implicitWidth + Style.margin2XS, Style.fontSizeXXS * 2)
         height: Math.max(groupedWorkspaceNumber.implicitHeight + Style.marginXS, Style.fontSizeXXS * 2)
 
         Rectangle {

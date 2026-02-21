@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import qs.Commons
 import qs.Modules.MainScreen
+import qs.Modules.Panels.Settings
 import qs.Services.Networking
 import qs.Services.UI
 import qs.Widgets
@@ -102,7 +103,7 @@ SmartPanel {
   panelContent: Rectangle {
     color: "transparent"
 
-    property real contentPreferredHeight: Math.min(root.preferredHeight, mainColumn.implicitHeight + Style.marginL * 2)
+    property real contentPreferredHeight: Math.min(root.preferredHeight, mainColumn.implicitHeight + Style.margin2L)
 
     ColumnLayout {
       id: mainColumn
@@ -113,13 +114,14 @@ SmartPanel {
       // Header
       NBox {
         Layout.fillWidth: true
-        Layout.preferredHeight: header.implicitHeight + Style.marginXL
+        Layout.preferredHeight: header.implicitHeight + Style.margin2M
 
         ColumnLayout {
           id: header
           anchors.fill: parent
           anchors.margins: Style.marginM
           spacing: Style.marginM
+
           RowLayout {
             NIcon {
               id: modeIcon
@@ -140,25 +142,14 @@ SmartPanel {
                     panelViewMode = "wifi";
                   }
                 }
-                onEntered: TooltipService.show(parent, panelViewMode === "wifi" ? I18n.tr("control-center.wifi.label-ethernet") : I18n.tr("wifi.panel.title"))
+                onEntered: TooltipService.show(parent, panelViewMode === "wifi" ? I18n.tr("common.ethernet") : I18n.tr("common.wifi"))
                 onExited: TooltipService.hide()
               }
             }
 
-            NText {
-              text: panelViewMode === "wifi" ? I18n.tr("wifi.panel.title") : I18n.tr("control-center.wifi.label-ethernet")
-              pointSize: Style.fontSizeL
-              font.weight: Style.fontWeightBold
-              color: Color.mOnSurface
+            NLabel {
+              label: panelViewMode === "wifi" ? I18n.tr("common.wifi") : I18n.tr("common.ethernet")
               Layout.fillWidth: true
-            }
-
-            NToggle {
-              id: wifiSwitch
-              visible: panelViewMode === "wifi"
-              checked: Settings.data.network.wifiEnabled
-              onToggled: checked => NetworkService.setWifiEnabled(checked)
-              baseSize: Style.baseWidgetSize * 0.7 // Slightly smaller
             }
 
             NIconButton {
@@ -172,6 +163,22 @@ SmartPanel {
                 else
                   NetworkService.refreshEthernet();
               }
+            }
+
+            NToggle {
+              id: wifiSwitch
+              visible: panelViewMode === "wifi"
+              checked: Settings.data.network.wifiEnabled
+              enabled: !Settings.data.network.airplaneModeEnabled && NetworkService.wifiAvailable
+              onToggled: checked => NetworkService.setWifiEnabled(checked)
+              baseSize: Style.baseWidgetSize * 0.7 // Slightly smaller
+            }
+
+            NIconButton {
+              icon: "settings"
+              tooltipText: I18n.tr("tooltips.open-settings")
+              baseSize: Style.baseWidgetSize * 0.8
+              onClicked: SettingsPanelService.openToTab(SettingsPanel.Tab.Connections, 0, screen)
             }
 
             NIconButton {
@@ -188,8 +195,6 @@ SmartPanel {
             visible: NetworkService.hasEthernet()
             margins: Style.marginS
             Layout.fillWidth: true
-            border.color: Style.boxBorderColor
-            border.width: Style.borderS
             spacing: Style.marginM
             distributeEvenly: true
             currentIndex: root.panelViewMode === "wifi" ? 0 : 1
@@ -198,13 +203,13 @@ SmartPanel {
             }
 
             NTabButton {
-              text: I18n.tr("tooltips.manage-wifi")
+              text: I18n.tr("common.wifi")
               tabIndex: 0
               checked: modeTabBar.currentIndex === 0
             }
 
             NTabButton {
-              text: I18n.tr("control-center.wifi.label-ethernet")
+              text: I18n.tr("common.ethernet")
               tabIndex: 1
               checked: modeTabBar.currentIndex === 1
             }
@@ -223,7 +228,7 @@ SmartPanel {
         Rectangle {
           visible: panelViewMode === "wifi" && NetworkService.lastError.length > 0
           Layout.fillWidth: true
-          Layout.preferredHeight: errorRow.implicitHeight + (Style.marginXL)
+          Layout.preferredHeight: errorRow.implicitHeight + Style.margin2M
           color: Qt.alpha(Color.mError, 0.1)
           radius: Style.radiusS
           border.width: Style.borderS
@@ -277,7 +282,7 @@ SmartPanel {
               id: disabledBox
               visible: panelViewMode === "wifi" && !Settings.data.network.wifiEnabled
               Layout.fillWidth: true
-              Layout.preferredHeight: disabledColumn.implicitHeight + Style.marginXL
+              Layout.preferredHeight: disabledColumn.implicitHeight + Style.margin2M
 
               ColumnLayout {
                 id: disabledColumn
@@ -323,7 +328,7 @@ SmartPanel {
               id: scanningBox
               visible: panelViewMode === "wifi" && Settings.data.network.wifiEnabled && Object.keys(NetworkService.networks).length === 0 && NetworkService.scanning
               Layout.fillWidth: true
-              Layout.preferredHeight: scanningColumn.implicitHeight + Style.marginXL
+              Layout.preferredHeight: scanningColumn.implicitHeight + Style.margin2M
 
               ColumnLayout {
                 id: scanningColumn
@@ -360,7 +365,7 @@ SmartPanel {
               id: emptyBox
               visible: panelViewMode === "wifi" && Settings.data.network.wifiEnabled && !NetworkService.scanning && Object.keys(NetworkService.networks).length === 0 && !NetworkService.scanning
               Layout.fillWidth: true
-              Layout.preferredHeight: emptyColumn.implicitHeight + Style.marginXL
+              Layout.preferredHeight: emptyColumn.implicitHeight + Style.margin2M
 
               ColumnLayout {
                 id: emptyColumn
@@ -469,7 +474,7 @@ SmartPanel {
               NBox {
                 visible: !(NetworkService.ethernetInterfaces && NetworkService.ethernetInterfaces.length > 0)
                 Layout.fillWidth: true
-                Layout.preferredHeight: emptyEthColumn.implicitHeight + Style.marginXL
+                Layout.preferredHeight: emptyEthColumn.implicitHeight + Style.margin2M
 
                 ColumnLayout {
                   id: emptyEthColumn
@@ -516,7 +521,7 @@ SmartPanel {
                     Layout.fillWidth: true
                     Layout.leftMargin: Style.marginXS
                     Layout.rightMargin: Style.marginXS
-                    implicitHeight: ethItemColumn.implicitHeight + (Style.marginXL)
+                    implicitHeight: ethItemColumn.implicitHeight + Style.margin2M
                     radius: Style.radiusM
                     border.width: Style.borderS
                     border.color: modelData.connected ? Color.mPrimary : Color.mOutline
@@ -524,7 +529,7 @@ SmartPanel {
 
                     ColumnLayout {
                       id: ethItemColumn
-                      width: parent.width - (Style.marginXL)
+                      width: parent.width - Style.margin2M
                       x: Style.marginM
                       y: Style.marginM
                       spacing: Style.marginS
@@ -565,8 +570,8 @@ SmartPanel {
                               visible: modelData.connected
                               color: Color.mPrimary
                               radius: height * 0.5
-                              width: ethConnectedText.implicitWidth + (Style.marginS * 2)
-                              height: ethConnectedText.implicitHeight + (Style.marginXS)
+                              width: ethConnectedText.implicitWidth + Style.margin2S
+                              height: ethConnectedText.implicitHeight + (Style.margin2XXS)
 
                               NText {
                                 id: ethConnectedText
@@ -626,7 +631,7 @@ SmartPanel {
                         radius: Style.radiusS
                         border.width: Style.borderS
                         border.color: Color.mOutline
-                        implicitHeight: ethInfoGrid.implicitHeight + Style.marginS * 2
+                        implicitHeight: ethInfoGrid.implicitHeight + Style.margin2S
                         clip: true
                         Layout.topMargin: Style.marginXS
 
@@ -707,7 +712,7 @@ SmartPanel {
                                   const value = (NetworkService.activeEthernetDetails.ifname && NetworkService.activeEthernetDetails.ifname.length > 0) ? NetworkService.activeEthernetDetails.ifname : (NetworkService.activeEthernetIf || "");
                                   if (value.length > 0) {
                                     Quickshell.execDetached(["wl-copy", value]);
-                                    ToastService.showNotice(I18n.tr("control-center.wifi.label-ethernet"), I18n.tr("toast.bluetooth.address-copied"), "ethernet");
+                                    ToastService.showNotice(I18n.tr("common.ethernet"), I18n.tr("toast.bluetooth.address-copied"), "ethernet");
                                   }
                                 }
                               }
@@ -859,7 +864,7 @@ SmartPanel {
                                   const value = NetworkService.activeEthernetDetails.ipv4 || "";
                                   if (value.length > 0) {
                                     Quickshell.execDetached(["wl-copy", value]);
-                                    ToastService.showNotice(I18n.tr("control-center.wifi.label-ethernet"), I18n.tr("toast.bluetooth.address-copied"), "ethernet");
+                                    ToastService.showNotice(I18n.tr("common.ethernet"), I18n.tr("toast.bluetooth.address-copied"), "ethernet");
                                   }
                                 }
                               }

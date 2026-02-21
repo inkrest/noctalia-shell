@@ -23,6 +23,24 @@ ColumnLayout {
     defaultValue: Settings.getDefaultValue("notifications.enabled")
   }
 
+  NComboBox {
+    label: I18n.tr("panels.notifications.settings-density-label")
+    description: I18n.tr("panels.notifications.settings-density-description")
+    model: [
+      {
+        "key": "default",
+        "name": I18n.tr("options.notification-density.default")
+      },
+      {
+        "key": "compact",
+        "name": I18n.tr("options.notification-density.compact")
+      }
+    ]
+    currentKey: Settings.data.notifications.density || "default"
+    onSelected: key => Settings.data.notifications.density = key
+    defaultValue: Settings.getDefaultValue("notifications.density")
+  }
+
   NToggle {
     label: I18n.tr("tooltips.do-not-disturb-enabled")
     description: I18n.tr("panels.notifications.settings-do-not-disturb-description")
@@ -79,6 +97,7 @@ ColumnLayout {
     from: 0
     to: 1
     stepSize: 0.01
+    showReset: true
     value: Settings.data.notifications.backgroundOpacity
     onMoved: value => Settings.data.notifications.backgroundOpacity = value
     text: Math.round(Settings.data.notifications.backgroundOpacity * 100) + "%"
