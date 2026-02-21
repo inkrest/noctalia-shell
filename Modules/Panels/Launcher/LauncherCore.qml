@@ -798,15 +798,6 @@ Rectangle {
           }
         }
       }
-
-      NIconButton {
-        visible: root.showLayoutToggle
-        icon: Settings.data.appLauncher.viewMode === "grid" ? "layout-list" : "layout-grid"
-        tooltipText: Settings.data.appLauncher.viewMode === "grid" ? I18n.tr("tooltips.list-view") : I18n.tr("tooltips.grid-view")
-        Layout.preferredWidth: searchInput.height
-        Layout.preferredHeight: searchInput.height
-        onClicked: Settings.data.appLauncher.viewMode = Settings.data.appLauncher.viewMode === "grid" ? "list" : "grid"
-      }
     }
 
     // Unified category tabs (works with any provider that has categories)
@@ -855,6 +846,7 @@ Rectangle {
         reserveScrollbarSpace: false
         gradientColor: Color.mSurface
         wheelScrollMultiplier: 4.0
+        showGradientMasks: false
 
         width: parent.width
         height: parent.height
@@ -887,7 +879,8 @@ Rectangle {
           width: resultsList.availableWidth
           implicitHeight: root.entryHeight
           clip: true
-          color: entry.isSelected ? Color.mHover : Color.mSurface
+          // color: entry.isSelected ? Color.mHover : Color.mSurface
+          color: entry.isSelected ? Color.mHover : "transparent"
 
           Behavior on color {
             ColorAnimation {
@@ -1081,38 +1074,6 @@ Rectangle {
                   maximumLineCount: 1
                   Layout.fillWidth: true
                   visible: text !== ""
-                }
-              }
-
-              // Action buttons row - dynamically populated from provider
-              RowLayout {
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                spacing: Style.marginXS
-                visible: entry.isSelected && itemActions.length > 0
-
-                property var itemActions: {
-                  if (!entry.isSelected)
-                    return [];
-                  var provider = modelData.provider || root.currentProvider;
-                  if (provider && provider.getItemActions) {
-                    return provider.getItemActions(modelData);
-                  }
-                  return [];
-                }
-
-                Repeater {
-                  model: parent.itemActions
-                  NIconButton {
-                    icon: modelData.icon
-                    baseSize: Style.baseWidgetSize * 0.75
-                    tooltipText: modelData.tooltip
-                    z: 1
-                    onClicked: {
-                      if (modelData.action) {
-                        modelData.action();
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -1517,32 +1478,6 @@ Rectangle {
           }
         }
       }
-    }
-
-    NDivider {
-      Layout.fillWidth: true
-    }
-
-    NText {
-      Layout.fillWidth: true
-      text: {
-        if (root.results.length === 0) {
-          if (root.searchText) {
-            return I18n.tr("common.no-results");
-          }
-          // Use provider's empty browsing message if available
-          var provider = root.currentProvider;
-          if (provider && provider.emptyBrowsingMessage) {
-            return provider.emptyBrowsingMessage;
-          }
-          return "";
-        }
-        var prefix = root.activeProvider && root.activeProvider.name ? root.activeProvider.name + ": " : "";
-        return prefix + I18n.trp("common.result-count", root.results.length);
-      }
-      pointSize: Style.fontSizeXS
-      color: Color.mOnSurfaceVariant
-      horizontalAlignment: Text.AlignCenter
     }
   }
 }

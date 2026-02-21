@@ -811,7 +811,8 @@ Item {
       // Track whether dimensions have been initialized (to prevent initial changes from animating)
       property bool dimensionsInitialized: false
 
-      property var bezierCurve: [0.05, 0, 0.133, 0.06, 0.166, 0.4, 0.208, 0.82, 0.25, 1, 1, 1]
+      property var bezierCurveOpen: [0.1, 1.3, 0.4, 1, 1, 1]
+      property var bezierCurveClose: [0.6, 0, 0.9, -0.3, 1, 1]
 
       // Determine which edges the panel is closest to for animation direction
       // Use target position (not animated position) to avoid binding loops
@@ -1015,7 +1016,7 @@ Item {
 
       // Current animated width/height (referenced by x/y for right/bottom positioning)
       readonly property real currentWidth: {
-        if (isClosing && opacityFadeComplete && shouldAnimateWidth)
+        if (isClosing && shouldAnimateWidth)
           return 0;
         if (isClosing || isPanelVisible)
           return targetWidth;
@@ -1024,7 +1025,7 @@ Item {
         return shouldAnimateWidth ? 0 : targetWidth;
       }
       readonly property real currentHeight: {
-        if (isClosing && opacityFadeComplete && shouldAnimateHeight)
+        if (isClosing && shouldAnimateHeight)
           return 0;
         if (isClosing || isPanelVisible)
           return targetHeight;
@@ -1067,7 +1068,7 @@ Item {
           // During normal content resizing: always use normal duration
           duration: !panelBackground.dimensionsInitialized ? 0 : (root.isOpening && !panelBackground.shouldAnimateWidth) ? 0 : root.isOpening ? Style.animationNormal : (root.isClosing && !panelBackground.shouldAnimateWidth) ? 0 : root.isClosing ? Style.animationFast : Style.animationNormal
           easing.type: Easing.BezierSpline
-          easing.bezierCurve: panelBackground.bezierCurve
+          easing.bezierCurve: (!isClosing && !sizeAnimationComplete) ? panelBackground.bezierCurveOpen : panelBackground.bezierCurveClose
 
           onRunningChanged: {
             // Safety: Zero-duration animation handling
@@ -1097,7 +1098,7 @@ Item {
           // During normal content resizing: always use normal duration
           duration: !panelBackground.dimensionsInitialized ? 0 : (root.isOpening && !panelBackground.shouldAnimateHeight) ? 0 : root.isOpening ? Style.animationNormal : (root.isClosing && !panelBackground.shouldAnimateHeight) ? 0 : root.isClosing ? Style.animationFast : Style.animationNormal
           easing.type: Easing.BezierSpline
-          easing.bezierCurve: panelBackground.bezierCurve
+          easing.bezierCurve: (!isClosing && !sizeAnimationComplete) ? panelBackground.bezierCurveOpen : panelBackground.bezierCurveClose
 
           onRunningChanged: {
             // Safety: Zero-duration animation handling

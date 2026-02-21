@@ -182,7 +182,8 @@ RowLayout {
     background: Rectangle {
       implicitWidth: Math.round(Style.baseWidgetSize * 3.75 * Style.uiScaleRatio)
       implicitHeight: Math.round(root.preferredHeight * Style.uiScaleRatio)
-      color: Color.mSurface
+      // color: Color.mSurface
+      color: "transparent"
       border.color: combo.activeFocus ? Color.mSecondary : Color.mOutline
       border.width: Style.borderS
       radius: Style.iRadiusM

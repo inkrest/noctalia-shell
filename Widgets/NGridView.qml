@@ -25,7 +25,7 @@ Item {
   readonly property bool contentOverflows: gridView.contentHeight > gridView.height
 
   // Gradient properties
-  property bool showGradientMasks: true
+  property bool showGradientMasks: false
   property color gradientColor: Color.mSurfaceVariant
   property int gradientHeight: 16
   property bool reserveScrollbarSpace: true

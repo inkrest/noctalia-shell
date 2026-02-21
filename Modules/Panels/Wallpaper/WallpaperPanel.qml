@@ -13,7 +13,7 @@ SmartPanel {
   id: root
 
   preferredWidth: 800 * Style.uiScaleRatio
-  preferredHeight: 600 * Style.uiScaleRatio
+  preferredHeight: 660 * Style.uiScaleRatio
   preferredWidthRatio: 0.5
   preferredHeightRatio: 0.45
 
@@ -263,96 +263,13 @@ SmartPanel {
       // Header
       NBox {
         Layout.fillWidth: true
-        Layout.preferredHeight: headerColumn.implicitHeight + Style.marginL * 2
-        color: Color.mSurfaceVariant
+        Layout.preferredHeight: headerColumn.implicitHeight
+        color: "transparent"
 
         ColumnLayout {
           id: headerColumn
           anchors.fill: parent
-          anchors.margins: Style.marginL
           spacing: Style.marginM
-
-          RowLayout {
-            Layout.fillWidth: true
-            spacing: Style.marginM
-
-            NIcon {
-              icon: "settings-wallpaper-selector"
-              pointSize: Style.fontSizeXXL
-              color: Color.mPrimary
-            }
-
-            NText {
-              text: I18n.tr("wallpaper.panel.title")
-              pointSize: Style.fontSizeL
-              font.weight: Style.fontWeightBold
-              color: Color.mOnSurface
-              Layout.fillWidth: true
-            }
-
-            NIconButton {
-              icon: "palette"
-              tooltipText: I18n.tr("wallpaper.panel.solid-color-tooltip")
-              baseSize: Style.baseWidgetSize * 0.8
-              colorBg: Settings.data.wallpaper.useSolidColor ? Color.mPrimary : Color.mSurfaceVariant
-              colorFg: Settings.data.wallpaper.useSolidColor ? Color.mOnPrimary : Color.mPrimary
-              onClicked: solidColorPicker.open()
-            }
-
-            NIconButton {
-              icon: "settings"
-              tooltipText: I18n.tr("panels.wallpaper.settings-title")
-              baseSize: Style.baseWidgetSize * 0.8
-              onClicked: {
-                var settingsPanel = PanelService.getPanel("settingsPanel", screen);
-                settingsPanel.requestedTab = SettingsPanel.Tab.Wallpaper;
-                settingsPanel.open();
-              }
-            }
-
-            NIconButton {
-              icon: "close"
-              tooltipText: I18n.tr("common.close")
-              baseSize: Style.baseWidgetSize * 0.8
-              onClicked: root.close()
-            }
-          }
-
-          NDivider {
-            Layout.fillWidth: true
-          }
-
-          NToggle {
-            label: I18n.tr("wallpaper.panel.apply-all-monitors-label")
-            description: I18n.tr("wallpaper.panel.apply-all-monitors-description")
-            checked: Settings.data.wallpaper.setWallpaperOnAllMonitors
-            onToggled: checked => Settings.data.wallpaper.setWallpaperOnAllMonitors = checked
-            Layout.fillWidth: true
-          }
-
-          // Monitor tabs
-          NTabBar {
-            id: screenTabBar
-            visible: (!Settings.data.wallpaper.setWallpaperOnAllMonitors || Settings.data.wallpaper.enableMultiMonitorDirectories)
-            Layout.fillWidth: true
-            currentIndex: currentScreenIndex
-            onCurrentIndexChanged: currentScreenIndex = currentIndex
-            spacing: Style.marginM
-            distributeEvenly: true
-
-            Repeater {
-              model: Quickshell.screens
-              NTabButton {
-                required property var modelData
-                required property int index
-                text: modelData.name || `Screen ${index + 1}`
-                tabIndex: index
-                checked: {
-                  screenTabBar.currentIndex === index;
-                }
-              }
-            }
-          }
 
           // Unified search input and source
           RowLayout {
@@ -561,12 +478,11 @@ SmartPanel {
       NBox {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        color: Color.mSurfaceVariant
+        color: "transparent"
 
         StackLayout {
           id: contentStack
           anchors.fill: parent
-          anchors.margins: Style.marginL
 
           currentIndex: Settings.data.wallpaper.useWallhaven ? 1 : 0
 
@@ -758,125 +674,6 @@ SmartPanel {
     ColumnLayout {
       anchors.fill: parent
       spacing: Style.marginM
-
-      // Combined toolbar: navigation (left) + actions (right)
-      RowLayout {
-        Layout.fillWidth: true
-        spacing: Style.marginS
-
-        // Left side: navigation (back, home, path)
-        NIconButton {
-          icon: "arrow-left"
-          tooltipText: I18n.tr("wallpaper.browse.go-up")
-          enabled: isBrowseMode && currentBrowsePath !== WallpaperService.getMonitorDirectory(targetScreen?.name ?? "")
-          onClicked: WallpaperService.navigateUp(targetScreen?.name ?? "")
-          baseSize: Style.baseWidgetSize * 0.8
-        }
-
-        NIconButton {
-          icon: "home"
-          tooltipText: I18n.tr("wallpaper.browse.go-root")
-          enabled: isBrowseMode && currentBrowsePath !== WallpaperService.getMonitorDirectory(targetScreen?.name ?? "")
-          onClicked: WallpaperService.navigateToRoot(targetScreen?.name ?? "")
-          baseSize: Style.baseWidgetSize * 0.8
-        }
-
-        NScrollText {
-          text: isBrowseMode ? currentBrowsePath : WallpaperService.getMonitorDirectory(targetScreen?.name ?? "")
-          Layout.fillWidth: true
-          scrollMode: NScrollText.ScrollMode.Hover
-          NText {
-            text: isBrowseMode ? currentBrowsePath : WallpaperService.getMonitorDirectory(targetScreen?.name ?? "")
-            pointSize: Style.fontSizeS
-            color: Color.mOnSurfaceVariant
-          }
-        }
-
-        // Right side: actions (view mode, hide filenames, refresh)
-        NIconButton {
-          property string sortOrder: Settings.data.wallpaper.sortOrder || "name"
-          icon: {
-            if (sortOrder === "date_desc")
-              return "clock";
-            if (sortOrder === "date_asc")
-              return "history";
-            if (sortOrder === "name_desc")
-              return "sort-descending";
-            if (sortOrder === "random")
-              return "arrows-shuffle";
-            return "sort-ascending";
-          }
-          tooltipText: {
-            if (sortOrder === "date_desc")
-              return "Sort: Newest First";
-            if (sortOrder === "date_asc")
-              return "Sort: Oldest First";
-            if (sortOrder === "name_desc")
-              return "Sort: Name (Z-A)";
-            if (sortOrder === "random")
-              return "Sort: Random";
-            return "Sort: Name (A-Z)";
-          }
-          baseSize: Style.baseWidgetSize * 0.8
-          onClicked: {
-            var next = "name";
-            if (sortOrder === "name")
-              next = "date_desc";
-            else if (sortOrder === "date_desc")
-              next = "name"; // Toggle simpler: Name -> Newest -> Name
-            // Expanded cycle: Name -> Newest -> Oldest -> Z-A -> Random -> Name
-            // User just asked for "newest first", so let's make it easy to reach.
-            // Let's do: Name (A-Z) -> Newest -> Oldest -> Name (Z-A) -> ...
-
-            if (sortOrder === "name")
-              next = "date_desc";
-            else if (sortOrder === "date_desc")
-              next = "date_asc";
-            else if (sortOrder === "date_asc")
-              next = "name_desc";
-            else if (sortOrder === "name_desc")
-              next = "random";
-            else
-              next = "name";
-
-            Settings.data.wallpaper.sortOrder = next;
-          }
-        }
-
-        NIconButton {
-          icon: getViewModeIcon()
-          tooltipText: getViewModeTooltip()
-          baseSize: Style.baseWidgetSize * 0.8
-          onClicked: cycleViewMode()
-        }
-
-        NIconButton {
-          icon: Settings.data.wallpaper.hideWallpaperFilenames ? "id-off" : "id"
-          tooltipText: Settings.data.wallpaper.hideWallpaperFilenames ? I18n.tr("panels.wallpaper.settings-hide-wallpaper-filenames-tooltip-show") : I18n.tr("panels.wallpaper.settings-hide-wallpaper-filenames-tooltip-hide")
-          baseSize: Style.baseWidgetSize * 0.8
-          onClicked: Settings.data.wallpaper.hideWallpaperFilenames = !Settings.data.wallpaper.hideWallpaperFilenames
-        }
-
-        NIconButton {
-          icon: Settings.data.wallpaper.showHiddenFiles ? "eye" : "eye-closed"
-          tooltipText: Settings.data.wallpaper.showHiddenFiles ? I18n.tr("panels.wallpaper.settings-show-hidden-files-tooltip-hide") : I18n.tr("panels.wallpaper.settings-show-hidden-files-tooltip-show")
-          baseSize: Style.baseWidgetSize * 0.8
-          onClicked: Settings.data.wallpaper.showHiddenFiles = !Settings.data.wallpaper.showHiddenFiles
-        }
-
-        NIconButton {
-          icon: "refresh"
-          tooltipText: I18n.tr("tooltips.refresh-wallpaper-list")
-          baseSize: Style.baseWidgetSize * 0.8
-          onClicked: {
-            if (isBrowseMode) {
-              refreshWallpaperScreenData();
-            } else {
-              WallpaperService.refreshWallpapersList();
-            }
-          }
-        }
-      }
 
       NGridView {
         id: wallpaperGridView

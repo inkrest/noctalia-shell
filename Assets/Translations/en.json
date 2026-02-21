@@ -1524,9 +1524,9 @@
     "enter-width-pixels": "Enter width in pixels",
     "search": "Search...",
     "search-icons": "e.g. noctalia, niri, battery, cloud",
-    "search-launcher": "Search entries... or use > for commands",
+    "search-launcher": "Search entries...",
     "search-wallhaven": "Search Wallhaven...",
-    "search-wallpapers": "Type to filter wallpapers..."
+    "search-wallpapers": "Search wallpapers..."
   },
   "positions": {
     "bottom": "Bottom",

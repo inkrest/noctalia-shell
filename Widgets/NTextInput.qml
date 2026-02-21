@@ -65,7 +65,8 @@ ColumnLayout {
       id: frame
 
       radius: Style.iRadiusM
-      color: Color.mSurface
+      // color: Color.mSurface
+      color: "transparent"
       border.color: input.activeFocus ? Color.mSecondary : Color.mOutline
       border.width: Style.borderS
 
